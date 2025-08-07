@@ -39,6 +39,6 @@ A simple, user-friendly To-Do List web application built with HTML, CSS, and Jav
 No installation needed! Simply clone or download this repository and open `index.html` in your browser.
 
 ```bash
-git clone https://github.com/yourusername/todo-list-app.git
+git clone https://github.com/mendoncaarnold/todo-list-app.git
 cd todo-list-app
 open index.html
