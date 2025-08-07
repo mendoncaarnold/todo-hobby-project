@@ -3,9 +3,15 @@ const addBtn = document.getElementById('add-btn');
 const taskList = document.getElementById('task-list');
 const searchBox = document.getElementById('search-box');
 const dueDateInput = document.getElementById('due-date');
+const undoBtn = document.getElementById('undo-btn');
+const resetBtn = document.getElementById('reset-btn');
+
 let currentFilter = 'all';
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+let lastDeletedTask = null;
+let lastDeletedIndex = null;
 
 function renderTasks() {
   taskList.innerHTML = '';
@@ -22,12 +28,21 @@ function renderTasks() {
     if (matchesFilter && matchesSearch) {
       const li = document.createElement('li');
       li.className = task.completed ? 'completed' : '';
-      li.innerHTML = `
-        <span onclick="toggleTask(${index})">
-          ${task.text}${task.dueDate ? ' ⏰ ' + task.dueDate : ''}
-        </span>
-        <button class="delete-btn" onclick="deleteTask(${index})">X</button>
-      `;
+
+      const span = document.createElement('span');
+      span.textContent = task.text + (task.dueDate ? ' ⏰ ' + task.dueDate : '');
+      span.style.flex = '1';
+      span.style.cursor = 'pointer';
+      span.addEventListener('click', () => toggleTask(index));
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.title = 'Delete task';
+      deleteBtn.addEventListener('click', () => deleteTask(index));
+
+      li.appendChild(span);
+      li.appendChild(deleteBtn);
       taskList.appendChild(li);
     }
   });
@@ -50,8 +65,37 @@ function toggleTask(index) {
 }
 
 function deleteTask(index) {
+  lastDeletedTask = tasks[index];
+  lastDeletedIndex = index;
+
   tasks.splice(index, 1);
   saveAndRender();
+
+  undoBtn.disabled = false;  // Enable Undo button
+}
+
+function undoDelete() {
+  if (lastDeletedTask !== null && lastDeletedIndex !== null) {
+    tasks.splice(lastDeletedIndex, 0, lastDeletedTask);
+    saveAndRender();
+
+    lastDeletedTask = null;
+    lastDeletedIndex = null;
+
+    undoBtn.disabled = true;  // Disable Undo button
+  }
+}
+
+function resetAll() {
+  if (confirm('Are you sure you want to delete all tasks?')) {
+    tasks = [];
+    saveAndRender();
+
+    lastDeletedTask = null;
+    lastDeletedIndex = null;
+
+    undoBtn.disabled = true;
+  }
 }
 
 function filterTasks(type) {
@@ -69,6 +113,8 @@ taskInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') addTask();
 });
 searchBox.addEventListener('input', renderTasks);
+undoBtn.addEventListener('click', undoDelete);
+resetBtn.addEventListener('click', resetAll);
 
 // Theme toggle
 document.getElementById('toggle-theme').addEventListener('click', () => {
@@ -82,4 +128,5 @@ window.addEventListener('load', () => {
     document.body.classList.add('dark');
   }
   renderTasks();
+  undoBtn.disabled = true; // Undo disabled initially
 });
