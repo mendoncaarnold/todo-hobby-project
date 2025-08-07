@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>To-Do List</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -24,6 +24,11 @@
       <button onclick="filterTasks('all')">All</button>
       <button onclick="filterTasks('completed')">Completed</button>
       <button onclick="filterTasks('pending')">Pending</button>
+    </div>
+
+    <div class="actions">
+      <button id="undo-btn" disabled>Undo Delete</button>
+      <button id="reset-btn">Reset All</button>
     </div>
 
     <ul id="task-list"></ul>
